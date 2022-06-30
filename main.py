@@ -4,10 +4,8 @@ from bs4 import BeautifulSoup
 from telegram import Update
 from telegram.ext import Updater, CallbackContext, CommandHandler, MessageHandler, Filters
 
-from sqlalchemy import select
-
-from settings import TOKEN
-from database import City, Base, engine, session
+from settings import TOKEN, WIKI_LINK
+from database import City, Base, engine
 
 
 updater = Updater(token=TOKEN, use_context=True)
@@ -30,9 +28,7 @@ def update_database(update: Update, context: CallbackContext):
 
     Base.metadata.create_all(engine)
 
-    LINK = 'https://ru.wikipedia.org/wiki/%D0%93%D0%BE%D1%80%D0%BE%D0%B4%D1%81%D0%BA%D0%B8%D0%B5_%D0%BD%D0%B0%D1%81%D0%B5%D0%BB%D1%91%D0%BD%D0%BD%D1%8B%D0%B5_%D0%BF%D1%83%D0%BD%D0%BA%D1%82%D1%8B_%D0%9C%D0%BE%D1%81%D0%BA%D0%BE%D0%B2%D1%81%D0%BA%D0%BE%D0%B9_%D0%BE%D0%B1%D0%BB%D0%B0%D1%81%D1%82%D0%B8'
-
-    page = requests.get(LINK).text
+    page = requests.get(WIKI_LINK).text
 
     soup = BeautifulSoup(page, 'html.parser')
     tables = soup.findAll('table')
@@ -54,7 +50,7 @@ def update_database(update: Update, context: CallbackContext):
 
 def city_search(update: Update, context: CallbackContext):
     message = update.message.text
-    city_objects = session.execute(select(City).where(City.name.like(f"{message}%"))).scalars().all()
+    city_objects = City.get(message)
     if len(city_objects) > 1:
         response_message = 'Найдено несколько городов. Некоторые из них: \n'
         for city in city_objects[:5]:

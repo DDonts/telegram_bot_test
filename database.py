@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Integer, update, exists
+from sqlalchemy import create_engine, Column, String, Integer, update, exists, select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -37,3 +37,7 @@ class City(Base):
         session.execute(
             update(City).where(City.name == self.name).values(population=self.population, url=self.url))
         session.commit()
+
+    @staticmethod
+    def find_by_name(message):
+        return session.execute(select(City).where(City.name.like(f"{message}%"))).scalars().all()
