@@ -50,7 +50,7 @@ def update_database(update: Update, context: CallbackContext):
 
 def city_search(update: Update, context: CallbackContext):
     message = update.message.text
-    city_objects = City.get(message)
+    city_objects = City.find_by_name(message)
     if len(city_objects) > 1:
         response_message = 'Найдено несколько городов. Некоторые из них: \n'
         for city in city_objects[:5]:
