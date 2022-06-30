@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String, Integer, update, exists, select
+from sqlalchemy import create_engine, Column, String, Integer, update, exists, select, func
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -39,5 +39,5 @@ class City(Base):
         session.commit()
 
     @staticmethod
-    def find_by_name(message):
-        return session.execute(select(City).where(City.name.like(f"{message}%"))).scalars().all()
+    def find_by_name(message: str):
+        return session.execute(select(City).where(City.name.like(f"{message.capitalize()}%"))).scalars().all()
